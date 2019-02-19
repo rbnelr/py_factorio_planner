@@ -21,6 +21,15 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="factorio_data.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="factorio_entities.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="graphics.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="py_factorio_planner.py" />
     <Compile Include="timer.py">
       <SubType>Code</SubType>
