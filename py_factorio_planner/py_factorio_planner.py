@@ -5,7 +5,12 @@ from timer import Timer
 from factorio_entities import * 
 
 # entity instances
-entities = {name: entity_classes[name]() for name in entity_classes}
+x = 0
+
+entities = {}
+for name in entity_classes:
+	entities[name] = entity_classes[name]((x,0))
+	x += 64*5
 
 #
 timer = Timer.begin()
@@ -26,12 +31,9 @@ while run:
 
 	wnd.fill((50,50,50))
 
-	x = 0
-
 	for e in entities.values():
 		e.update(dt)
-		e.draw_entity(wnd, (x,0))
-		x += 64*5
+		e.draw_entity(wnd)
 
 	pg.display.flip()
 

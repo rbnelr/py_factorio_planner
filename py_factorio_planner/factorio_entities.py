@@ -3,15 +3,16 @@ from graphics import *
 
 class Assembling_Machine:
     
-	def __init__ (self):
+	def __init__ (self, pos):
 		self.work_t = 0 # [0,1) work anim
+		self.pos = pos
 
-	def draw_entity (self, wnd, pos):
+	def draw_entity (self, wnd):
 		for l in [l for l in self.sprite_layers if l.draw_as_shadow]:
-			l.draw(wnd, pos, self.work_t)
+			l.draw(wnd, self.pos, self.work_t)
 
 		for l in [l for l in self.sprite_layers if not l.draw_as_shadow]:
-			l.draw(wnd, pos, self.work_t)
+			l.draw(wnd, self.pos, self.work_t)
 
 	def update (self, dt):
 		self.work_t += dt * self.crafting_speed
