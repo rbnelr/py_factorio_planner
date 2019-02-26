@@ -7,17 +7,17 @@ class Assembling_Machine:
 		self.work_t = 0 # [0,1) work anim
 		self.pos = pos
 
-	def push_entity (self):
-		#if (self.idle_animation_sprite_layers):
-		#	for l in [l for l in self.idle_animation_sprite_layers if l.draw_as_shadow]:
-		#		l.draw(self.pos, self.work_t)
-		#
-		#	for l in [l for l in self.idle_animation_sprite_layers if not l.draw_as_shadow]:
-		#		l.draw(self.pos, self.work_t)
-		#
-		#for l in [l for l in self.sprite_layers if l.draw_as_shadow]:
-		#	l.draw(self.pos, self.work_t)
-		#
+	def draw_entity (self):
+		if (self.idle_animation_sprite_layers):
+			for l in [l for l in self.idle_animation_sprite_layers if l.draw_as_shadow]:
+				l.draw(self.pos, self.work_t)
+		
+			for l in [l for l in self.idle_animation_sprite_layers if not l.draw_as_shadow]:
+				l.draw(self.pos, self.work_t)
+		
+		for l in [l for l in self.sprite_layers if l.draw_as_shadow]:
+			l.draw(self.pos, self.work_t)
+		
 		for l in [l for l in self.sprite_layers if not l.draw_as_shadow]:
 			l.draw(self.pos, self.work_t)
 

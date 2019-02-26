@@ -5,8 +5,6 @@ import collections
 
 from timer import Timer
 
-timer = Timer.begin()
-dt = 0
 
 class Window(pyglet.window.Window):
 	def __init__(self):
@@ -17,21 +15,25 @@ class Window(pyglet.window.Window):
 		self.quit = False
 		self.is_fullscreen = False # fullscreen already in pyglet window?
 
-		self.dt = 0
-		self.fps_limit = 160
+		
+		self.counter = 0
+
+		self.timer = Timer.begin()
+		self.fps_limit = 160.0
+
+		self.dt = 0.0
 
 		self.dt_history = collections.deque(maxlen = 60)
+		
 
 		self.dbg_counter = pyglet.text.Label(font_name="Consolas", font_size=17)
-
-		self.counter = 0
 
 	def draw(self, f):
 		self.user_draw = f
 
 	def _draw(self, flip=True):
 		if self.user_draw:
-			self.user_draw()
+			self.user_draw(self.dt)
 		
 		def mean(numbers):
 			return float(sum(numbers)) / max(len(numbers), 1)
@@ -50,9 +52,9 @@ class Window(pyglet.window.Window):
 			self.flip()
 		
 		if self.fps_limit:
-			Timer.accurate_sleep_until(timer.prev_ts + int(Timer.freq / self.fps_limit))
+			Timer.accurate_sleep_until(self.timer.prev_ts + int(Timer.freq / self.fps_limit))
 
-		self.dt = min(timer.step(), 1 / 20) # max dt
+		self.dt = min(self.timer.step(), 1 / 20) # max dt
 
 		self.dt_history.append(self.dt)
 

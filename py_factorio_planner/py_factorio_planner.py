@@ -1,4 +1,4 @@
-from window import Window, dt, gl
+from window import Window, gl
 
 wnd = Window()
 
@@ -13,16 +13,12 @@ for name in entity_classes:
 	x += 64*5
 
 @wnd.draw
-def draw():
+def draw(dt):
 	gl.glClearColor(50/255, 50/255, 50/255, 1)
 	wnd.clear()
 
-	#for e in entities.values():
-	#	e.update(dt)
-	#	e.push_entity()
-	
-	e = entities["assembling-machine-1"]
-	e.update(dt)
-	e.push_entity()
+	for e in entities.values():
+		e.update(dt)
+		e.draw_entity()
 
 wnd.run()

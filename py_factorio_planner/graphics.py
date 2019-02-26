@@ -33,52 +33,60 @@ class Sprite_Sheet:
 		if "hr_version" in d:
 			d = d["hr_version"]
 
-		i = Sprite_Sheet()
+		ss = Sprite_Sheet()
 
-		i.filename			= d["filename"]
+		ss.filename			= d["filename"]
 
-		i.width				= d["width"]
-		i.height			= d["height"]
+		ss.width			= d["width"]
+		ss.height			= d["height"]
 
-		i.frame_count		= d.get("frame_count", 1)
-		i.line_length		= d.get("line_length", 1)
+		ss.frame_count		= d.get("frame_count", 1)
+		ss.line_length		= d.get("line_length", 1)
 
-		i.scale				= d.get("scale", 1)
-		i.shift				= d.get("shift", (0,0))
+		ss.scale			= d.get("scale", 1)
+		ss.shift			= d.get("shift", (0,0))
 
-		i.draw_as_shadow	= d.get("draw_as_shadow", False)
-		i.blend_mode		= d.get("blend_mode", "normal")
+		ss.draw_as_shadow	= d.get("draw_as_shadow", False)
+		ss.blend_mode		= d.get("blend_mode", "normal")
 
-		img = load_image(i.filename)
-		img_seq = pyglet.image.ImageGrid(img, i.line_length, i.frame_count // i.line_length, i.width, i.height)
-		anim = pyglet.image.Animation.from_image_sequence(img_seq, 0.1, True)
+		sheet_img = load_image(ss.filename)
+		#img_seq = pyglet.image.ImageGrid(img, i.line_length, i.frame_count // i.line_length, i.width, i.height)
+		#anim = pyglet.image.Animation.from_image_sequence(img_seq, 0.1, True)
+		
+		blend_src = pyglet.gl.GL_SRC_ALPHA
+		blend_dst = pyglet.gl.GL_ONE_MINUS_SRC_ALPHA
 
-		i.sprite			= pyglet.sprite.Sprite(anim)
+		if (ss.blend_mode == "additive"):
+			blend_src = pyglet.gl.GL_SRC_ALPHA
+			blend_dst = pyglet.gl.GL_ONE
 
-		return i
+		ss.sprites = []
+		for i in range(ss.frame_count):
+			fy, fx = divmod(i, ss.line_length) # frame pos in sprite sheet
+			
+			s = pyglet.sprite.Sprite(sheet_img.get_region(fx * ss.width, sheet_img.height - (fy+1) * ss.height,  ss.width, ss.height), blend_src=blend_src, blend_dest=blend_dst)
+
+			if ss.draw_as_shadow:
+				s.opacity = 127
+
+			ss.sprites.append(s)
+
+		return ss
 	
 	def draw (self, pos, anim_t):
 
-		fy, fx = divmod(int(anim_t * self.frame_count), self.line_length)
+		frame = int(anim_t * self.frame_count)
 
 		pos = (pos[0] - self.width/2, pos[1] - self.height/2) # sprites are places using their center
 
 		pos = (	pos[0] + self.shift[0] * 32 / self.scale,
-				pos[1] + self.shift[1] * 32 / self.scale )
+				pos[1] - self.shift[1] * 32 / self.scale )
 
 		pos = (pos[0] + 64*3/2, pos[1] + 64*5) # offset for now
 		
 
-		flags = 0
-
-		if (self.blend_mode == "additive"):
-			#flags |= pg.BLEND_ADD
-			pass
-
-		#self.sprite, pos, pg.Rect(fx*self.width, fy*self.height,  self.width,self.height), flags)
-
-		#self.sprite._animate(0.1)
-		self.sprite.draw()
+		self.sprites[frame].position = pos
+		self.sprites[frame].draw()
 
 def load_icon (name):
 	return load_image(icons_dir + name + ".png");
