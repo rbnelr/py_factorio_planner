@@ -10,21 +10,27 @@ def load_image (filename):
 
 def load_sprite (filename):
 	try:
-		return pyglet.sprite.Sprite(load_image())
+		return pyglet.sprite.Sprite(load_image(filename))
 
 	except Exception:
 		return None # not loaded
 
 class Icon:
-    def __repr__ (self): return self.name
+	def __repr__ (self): return self.name
 
-    def load (filename):
-        i = Icon()
+	def load (filename):
+		i = Icon()
 
-        i.filename = filename
-        i.sprite = load_sprite(filename)
+		i.filename = filename
+		i.sprite = load_sprite(filename)
 
-        return i
+		return i
+	
+	def draw (self, pos, size):
+		scale = size[0] / self.sprite._texture.width
+
+		self.sprite.update(pos[0] -size[0]/2, pos[1] -size[1]/2, scale=scale)
+		self.sprite.draw()
 
 class Sprite_Sheet:
 	def __repr__ (self): return self.name
@@ -53,13 +59,17 @@ class Sprite_Sheet:
 		#img_seq = pyglet.image.ImageGrid(img, i.line_length, i.frame_count // i.line_length, i.width, i.height)
 		#anim = pyglet.image.Animation.from_image_sequence(img_seq, 0.1, True)
 		
+
+		if True:
+			ss.frame_count = 1 # this way of loading sprites with pyglet is too slow to startup, so disable animations
+
 		blend_src = pyglet.gl.GL_SRC_ALPHA
 		blend_dst = pyglet.gl.GL_ONE_MINUS_SRC_ALPHA
 
 		if (ss.blend_mode == "additive"):
 			blend_src = pyglet.gl.GL_SRC_ALPHA
 			blend_dst = pyglet.gl.GL_ONE
-
+		
 		ss.sprites = []
 		for i in range(ss.frame_count):
 			fy, fx = divmod(i, ss.line_length) # frame pos in sprite sheet
@@ -94,3 +104,14 @@ def load_icon (name):
 def load_entity_sprite_sheet (name, anim_frames):
 	return load_image(entity_dir + name + ".png");
 
+
+class Button:
+
+	def draw(pos, size, col):
+		x0, y0 = (pos[0] -size[0]/2, pos[1] -size[1]/2)
+		x1, y1 = (pos[0] +size[0]/2, pos[1] +size[1]/2)
+
+		pyglet.graphics.draw(4, pyglet.gl.GL_QUADS,
+			('v2f', (x0,y0, x1,y0, x1,y1, x0,y1)),
+			('c4B', (int(col[0]*255), int(col[1]*255), int(col[2]*255), 255) * 4)
+		)
