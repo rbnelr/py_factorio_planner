@@ -33,7 +33,7 @@ while run:
 
 	for e in entities.values():
 		e.update(dt)
-		e.draw_entity(wnd)
+		e.push_entity(wnd)
 
 	pg.display.flip()
 

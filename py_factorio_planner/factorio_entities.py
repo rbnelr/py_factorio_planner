@@ -7,7 +7,14 @@ class Assembling_Machine:
 		self.work_t = 0 # [0,1) work anim
 		self.pos = pos
 
-	def draw_entity (self, wnd):
+	def push_entity (self, wnd):
+		if (self.idle_animation_sprite_layers):
+			for l in [l for l in self.idle_animation_sprite_layers if l.draw_as_shadow]:
+				l.draw(wnd, self.pos, self.work_t)
+
+			for l in [l for l in self.idle_animation_sprite_layers if not l.draw_as_shadow]:
+				l.draw(wnd, self.pos, self.work_t)
+
 		for l in [l for l in self.sprite_layers if l.draw_as_shadow]:
 			l.draw(wnd, self.pos, self.work_t)
 
@@ -25,12 +32,24 @@ def assembling_machine_class (m): # creating classes via functions to adhere to 
 	cls.crafting_speed = m["crafting_speed"]
 
 	cls.icon = Icon.load(m["icon"])
-	
+
 	if ("north" in m["animation"]):
 		cls.sprite_layers = [ Sprite_Sheet.load(l) for l in m["animation"]["north"]["layers"] ] # north only for now
 	else: # same sprite for all oris
 		cls.sprite_layers = [ Sprite_Sheet.load(l) for l in m["animation"]["layers"] ]
 	
+	cls.always_draw_idle_animation	= m.get("always_draw_idle_animation", False)
+	idle_animation					= m.get("idle_animation", None)
+	
+	if (idle_animation):
+		if ("north" in idle_animation):
+			cls.idle_animation_sprite_layers = [ Sprite_Sheet.load(l) for l in idle_animation["north"]["layers"] ] # north only for now
+		else: # same sprite for all oris
+			cls.idle_animation_sprite_layers = [ Sprite_Sheet.load(l) for l in idle_animation["layers"] ]
+	else:
+		cls.idle_animation_sprite_layers = None
+		
+
 	return cls
 
 entity_classes = {}
