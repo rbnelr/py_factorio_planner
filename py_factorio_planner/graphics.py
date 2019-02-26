@@ -1,12 +1,19 @@
-import pygame as pg
+import pyglet
 from factorio_data import factorio_base_dir
 
 def load_image (filename):
-    try:
-        return pg.image.load(filename.replace("__base__", factorio_base_dir))
+	try:
+		return pyglet.image.load(filename.replace("__base__", factorio_base_dir))
 
-    except Exception:
-        return None # not loaded
+	except Exception:
+		return None # not loaded
+
+def load_sprite (filename):
+	try:
+		return pyglet.sprite.Sprite(load_image())
+
+	except Exception:
+		return None # not loaded
 
 class Icon:
     def __repr__ (self): return self.name
@@ -15,7 +22,7 @@ class Icon:
         i = Icon()
 
         i.filename = filename
-        i.image = load_image(filename)
+        i.sprite = load_sprite(filename)
 
         return i
 
@@ -30,7 +37,6 @@ class Sprite_Sheet:
 
 		i.filename			= d["filename"]
 
-		i.image				= load_image(i.filename)
 		i.width				= d["width"]
 		i.height			= d["height"]
 
@@ -43,9 +49,15 @@ class Sprite_Sheet:
 		i.draw_as_shadow	= d.get("draw_as_shadow", False)
 		i.blend_mode		= d.get("blend_mode", "normal")
 
+		img = load_image(i.filename)
+		img_seq = pyglet.image.ImageGrid(img, i.line_length, i.frame_count // i.line_length, i.width, i.height)
+		anim = pyglet.image.Animation.from_image_sequence(img_seq, 0.1, True)
+
+		i.sprite			= pyglet.sprite.Sprite(anim)
+
 		return i
 	
-	def push (self, pos, anim_t): # for use with pygame.Surface.blits
+	def draw (self, pos, anim_t):
 
 		fy, fx = divmod(int(anim_t * self.frame_count), self.line_length)
 
@@ -60,12 +72,13 @@ class Sprite_Sheet:
 		flags = 0
 
 		if (self.blend_mode == "additive"):
-			flags |= pg.BLEND_ADD
+			#flags |= pg.BLEND_ADD
+			pass
 
-		return (self.image, pos, pg.Rect(fx*self.width, fy*self.height,  self.width,self.height), flags)
+		#self.sprite, pos, pg.Rect(fx*self.width, fy*self.height,  self.width,self.height), flags)
 
-	def draw (self, wnd, *args):
-		pg.Surface.blit(wnd, *self.push(*args));
+		#self.sprite._animate(0.1)
+		self.sprite.draw()
 
 def load_icon (name):
 	return load_image(icons_dir + name + ".png");
